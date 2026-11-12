@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback — Page & Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="layout">
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Feedback</h1>
+
+      <p id="signinPrompt" class="panel signin-prompt" hidden>
+        Please <a href="/">sign in</a> to share feedback.
+      </p>
+
+      <div id="fbContent" hidden>
+        <section class="panel">
+          <h2 class="panel-title">Tell us what you think</h2>
+          <form id="fbForm" class="fb-form" novalidate>
+            <label class="span-2">
+              What are you reviewing?
+              <select id="fbTarget" required></select>
+            </label>
+
+            <div class="span-2">
+              <label style="margin-bottom:6px">Rating</label>
+              <div class="star-input" id="fbStars" role="radiogroup" aria-label="Rating"></div>
+            </div>
+
+            <label class="span-2">
+              Your comment
+              <textarea id="fbComment" maxlength="1000" placeholder="What did you like? What could be better?"></textarea>
+              <span class="fb-hint"><span id="fbCount">0</span>/1000</span>
+            </label>
+
+            <p class="fb-error span-2" id="fbError" role="alert"></p>
+            <button class="btn-primary span-2" type="submit" id="fbSubmit">Submit feedback</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Your previous feedback</h2>
+          <div id="fbList"></div>
+          <p id="fbEmpty" class="empty-state" hidden>You haven't submitted any feedback yet.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    let rating = 0;
+
+    function renderStars() {
+      const box = document.getElementById("fbStars");
+      box.innerHTML = "";
+      for (let i = 1; i <= 5; i++) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = "\u2605";
+        b.className = i <= rating ? "on" : "";
+        b.setAttribute("role", "radio");
+        b.setAttribute("aria-checked", String(i === rating));
+        b.setAttribute("aria-label", i + " star" + (i > 1 ? "s" : ""));
+        b.addEventListener("click", () => { rating = i; renderStars(); });
+        box.appendChild(b);
+      }
+    }
+
+    function fillTargets(orders) {
+      const sel = document.getElementById("fbTarget");
+      sel.innerHTML = "";
+      const first = new Option("Choose an item or order…", "");
+      sel.add(first);
+
+      function group(label, opts) {
+        if (!opts.length) return;
+        const g = document.createElement("optgroup");
+        g.label = label;
+        opts.forEach((o) => g.appendChild(o));
+        sel.appendChild(g);
+      }
+      group("Books", CATALOG.filter((p) => p.domain === "books")
+        .map((p) => new Option(p.name, "p:" + p.id)));
+      group("Art supplies", CATALOG.filter((p) => p.domain === "art")
+        .map((p) => new Option(p.name, "p:" + p.id)));
+      group("My orders", orders.map((o) => new Option("Order " + o.order_ref, "o:" + o.order_id)));
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "";
+      const d = new Date(iso + (iso.endsWith("Z") ? "" : "Z"));
+      return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    }
+
+    function renderList(items) {
+      const list = document.getElementById("fbList");
+      list.innerHTML = "";
+      document.getElementById("fbEmpty").hidden = items.length > 0;
+      items.forEach((f) => {
+        const row = document.createElement("div");
+        row.className = "fb-item";
+
+        const head = document.createElement("div");
+        head.className = "fb-item-head";
+        const t = document.createElement("p");
+        t.className = "fb-item-target";
+        t.textContent = f.target;
+        const d = document.createElement("span");
+        d.className = "fb-item-date";
+        d.textContent = fmtDate(f.created_at);
+        head.appendChild(t); head.appendChild(d);
+
+        const stars = document.createElement("div");
+        stars.className = "fb-stars";
+        stars.setAttribute("aria-label", f.rating + " out of 5");
+        stars.textContent = "\u2605".repeat(f.rating) + "\u2606".repeat(5 - f.rating);
+
+        const c = document.createElement("p");
+        c.className = "fb-comment";
+        c.textContent = f.comment;
+
+        row.appendChild(head); row.appendChild(stars); row.appendChild(c);
+        if (f.admin_response) {
+          const r = document.createElement("p");
+          r.className = "fb-reply";
+          r.textContent = "Page & Palette replied: " + f.admin_response;
+          row.appendChild(r);
+        }
+        list.appendChild(row);
+      });
+    }
+
+    async function loadFeedback() {
+      try {
+        const res = await fetch("/my/feedback");
+        if (res.status === 401) {
+          document.getElementById("signinPrompt").hidden = false;
+          return;
+        }
+        const data = await res.json();
+        document.getElementById("fbContent").hidden = false;
+        fillTargets(data.orders || []);
+        renderList(data.feedback || []);
+      } catch (e) {
+        document.getElementById("signinPrompt").hidden = false;
+        document.getElementById("signinPrompt").textContent =
+          "Could not load feedback. Make sure the app is running and try again.";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderStars();
+      loadFeedback();
+
+      const comment = document.getElementById("fbComment");
+      comment.addEventListener("input", () => {
+        document.getElementById("fbCount").textContent = comment.value.length;
+      });
+
+      document.getElementById("fbForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const err = document.getElementById("fbError");
+        err.textContent = "";
+
+        const target = document.getElementById("fbTarget").value;
+        const text = comment.value.trim();
+        if (!target) { err.textContent = "Choose the book, art supply or order you are reviewing."; return; }
+        if (!rating) { err.textContent = "Please choose a rating from 1 to 5 stars."; return; }
+        if (!text) { err.textContent = "Please write a short comment."; return; }
+
+        const body = { rating, comment: text };
+        if (target.startsWith("p:")) body.product_id = target.slice(2);
+        else body.order_id = Number(target.slice(2));
+
+        const btn = document.getElementById("fbSubmit");
+        btn.disabled = true;
+        try {
+          const res = await fetch("/my/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/JSON" },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+          if (data.response === "OK") {
+            showToast(data.message);
+            rating = 0; renderStars();
+            comment.value = "";
+            document.getElementById("fbCount").textContent = "0";
+            document.getElementById("fbTarget").value = "";
+            loadFeedback();
+          } else {
+            err.textContent = Object.values(data.errors || {})[0] || data.message || "Could not submit feedback.";
+          }
+        } catch (ex) {
+          err.textContent = "Cannot reach the server — make sure the app is running.";
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page & Palette — Books + Art Supplies</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="layout">
+
+<!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" id="siteSearch" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <!-- Homepage Tagline & Description Hero Banner -->
+      <section class="site-hero">
+        <div class="hero-text-col">
+          <h1 class="hero-tagline">A Place for Curious Minds and Creative Hands.</h1>
+          <p class="hero-description">
+            Page &amp; Palette brings together the worlds of books and art supplies in one creative space. Discover stories that spark your imagination and quality materials that help you turn your ideas into reality. Whether you're here to read, sketch, paint, or simply find inspiration, there's always something waiting to be created.
+          </p>
+        </div>
+        <div class="hero-img-col">
+          <img src="hero_banner.jpg" alt="A Place for Curious Minds and Creative Hands — Page &amp; Palette" class="hero-banner-img" />
+        </div>
+      </section>
+
+      <!-- Default homepage content: hero + best-seller shelves -->
+      <div id="homeDefault">
+        <section class="pairs-section" id="combos" aria-label="Curated Book & Art Supply Pairings">
+          <div class="pairs-header">
+            <h2><i class="icon" data-icon="flame"></i> Book &amp; Art Supply Bundles</h2>
+            <p class="pairs-sub">Curated pairs of 1 book and 1 matching art supply — click any card for a detailed
+              preview!</p>
+          </div>
+          <div class="pairs-rectangle" id="pairsRectangle"></div>
+        </section>
+
+        <section class="shelf" id="shelfBooks" aria-labelledby="bestsellersBooks">
+          <h2 id="bestsellersBooks"><i class="icon" data-icon="flame"></i> Best sellers in books</h2>
+          <div class="product-grid" id="booksShelf"></div>
+        </section>
+
+        <section class="shelf" id="shelfArt" aria-labelledby="bestsellersArt">
+          <h2 id="bestsellersArt"><i class="icon" data-icon="flame"></i> Best sellers in art supplies</h2>
+          <div class="product-grid" id="artShelf"></div>
+        </section>
+      </div>
+
+      <!-- Filtered / search results view (shown instead of the default view) -->
+      <div id="resultsView" hidden>
+        <div class="results-header">
+          <div>
+            <h1 id="resultsTitle">Results</h1>
+            <p class="results-count" id="resultsCount"></p>
+          </div>
+          <a href="index.html" class="clear-link">Clear &amp; back to home</a>
+        </div>
+
+        <div class="product-grid" id="resultsGrid"></div>
+        <p id="noResults" class="empty-state" hidden>No products matched. Try another search or category.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

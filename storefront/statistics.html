@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statistics — Page & Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="layout">
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Your statistics</h1>
+
+      <p id="signinPrompt" class="panel signin-prompt" hidden>
+        Please <a href="/">sign in</a> to see your statistics.
+      </p>
+
+      <div id="statsContent" hidden>
+        <section class="stats-row stats-grid-4">
+          <div class="stat-card"><p class="stat-number" id="sOrders">0</p><p class="stat-label">orders placed</p></div>
+          <div class="stat-card"><p class="stat-number" id="sSpent">₹0</p><p class="stat-label">total spent</p></div>
+          <div class="stat-card"><p class="stat-number" id="sItems">0</p><p class="stat-label">items bought</p></div>
+          <div class="stat-card"><p class="stat-number" id="sAvg">₹0</p><p class="stat-label">average order</p></div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Books vs art supplies</h2>
+          <div class="split-bar" id="splitBar"></div>
+          <div class="split-legend">
+            <span><i class="split-books"></i>Books: <b id="sBooks">0</b></span>
+            <span><i class="split-art"></i>Art supplies: <b id="sArt">0</b></span>
+            <span id="sFav" hidden>Favourite category: <b></b></span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Spending in the last 6 months</h2>
+          <div class="bar-list" id="monthBars"></div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Top categories</h2>
+          <div class="bar-list" id="catBars"></div>
+          <p id="catEmpty" class="empty-state" hidden>Buy something to see your favourite categories here.</p>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Recent orders</h2>
+          <div class="bill-table-wrap">
+            <table class="stat-table" id="orderTable" hidden>
+              <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="orderEmpty" class="empty-state" hidden>You haven't placed any orders yet.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    const rupees = (n) => "\u20B9" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
+    function bars(containerId, rows, valueText) {
+      const box = document.getElementById(containerId);
+      box.innerHTML = "";
+      const max = Math.max(1, ...rows.map((r) => r.value));
+      rows.forEach((r) => {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        const name = document.createElement("span");
+        name.className = "bar-name"; name.textContent = r.label; name.title = r.label;
+        const track = document.createElement("div");
+        track.className = "bar-track";
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = (r.value / max * 100) + "%";
+        track.appendChild(fill);
+        const val = document.createElement("span");
+        val.className = "bar-val"; val.textContent = valueText(r);
+        row.appendChild(name); row.appendChild(track); row.appendChild(val);
+        box.appendChild(row);
+      });
+    }
+
+    function render(d) {
+      document.getElementById("sOrders").textContent = d.total_orders;
+      document.getElementById("sSpent").textContent = rupees(d.total_spent);
+      document.getElementById("sItems").textContent = d.items_purchased;
+      document.getElementById("sAvg").textContent = rupees(d.average_order);
+      document.getElementById("sBooks").textContent = d.books_qty;
+      document.getElementById("sArt").textContent = d.art_qty;
+
+      const tot = d.books_qty + d.art_qty;
+      const split = document.getElementById("splitBar");
+      split.innerHTML = "";
+      if (tot) {
+        const b = document.createElement("div"); b.className = "split-books"; b.style.width = (d.books_qty / tot * 100) + "%";
+        const a = document.createElement("div"); a.className = "split-art"; a.style.width = (d.art_qty / tot * 100) + "%";
+        split.appendChild(b); split.appendChild(a);
+      }
+      const fav = document.getElementById("sFav");
+      fav.hidden = !d.favourite_category;
+      if (d.favourite_category) fav.querySelector("b").textContent = d.favourite_category;
+
+      bars("monthBars", d.monthly.map((m) => ({ label: m.label, value: m.spent, orders: m.orders })),
+        (r) => rupees(r.value));
+
+      document.getElementById("catEmpty").hidden = d.categories.length > 0;
+      bars("catBars", d.categories.map((c) => ({ label: c.name, value: c.qty, spent: c.spent })),
+        (r) => r.value + " item" + (r.value === 1 ? "" : "s"));
+
+      const table = document.getElementById("orderTable");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+      table.hidden = d.recent_orders.length === 0;
+      document.getElementById("orderEmpty").hidden = d.recent_orders.length > 0;
+      d.recent_orders.forEach((o) => {
+        const tr = document.createElement("tr");
+        [o.order_ref, o.date, o.items, rupees(o.total), o.status].forEach((v) => {
+          const td = document.createElement("td");
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const prompt = document.getElementById("signinPrompt");
+      try {
+        const res = await fetch("/my/statistics");
+        if (res.status === 401) { prompt.hidden = false; return; }
+        const data = await res.json();
+        document.getElementById("statsContent").hidden = false;
+        render(data);
+      } catch (e) {
+        prompt.hidden = false;
+        prompt.textContent = "Could not load statistics. Make sure the app is running and try again.";
+      }
+    });
+  </script>
+</body>
+
+</html>

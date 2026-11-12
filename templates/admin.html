@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Back Office — Page &amp; Palette</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body class="admin-page">
+
+<!-- ===== Global notification banner ===== -->
+<div id="adminBanner" class="global-banner" role="alert" aria-live="polite" hidden></div>
+
+<div class="admin-layout">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <a class="logo" href="/shop/" title="Go to the store">
+        <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true">
+          <path d="M6 24 L6 7 Q6 5 8 5 L15 5 L15 24 Q11 22 6 24 Z" fill="#FFF3E4"></path>
+          <path d="M24 24 L24 7 Q24 5 22 5 L15 5 L15 24 Q19 22 24 24 Z" fill="#E8A33D"></path>
+          <path d="M15 5 L20 1 L21.5 2.5 L16.5 6.2 Z" fill="#F2C6A0"></path>
+        </svg>
+        <span>Page &amp; Palette</span>
+      </a>
+      <div class="sidebar-brand-sub">Back Office</div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Admin navigation">
+      <button class="sidebar-nav-item active" id="nav-books"
+              onclick="switchAdminTab('books')" aria-current="page">
+        <span class="sidebar-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg></span> Books
+      </button>
+      <button class="sidebar-nav-item" id="nav-art"
+              onclick="switchAdminTab('art')">
+        <span class="sidebar-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg></span> Art Supplies
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="sidebar-nav-item sidebar-store-link" href="/shop/">
+        <span class="sidebar-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg></span> View store
+      </a>
+      <div class="sidebar-user">
+        <span class="sidebar-user-avatar">{{ admin_name[0]|upper }}</span>
+        <div>
+          <div class="sidebar-user-name">{{ admin_name }}</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="sidebar-logout" id="logoutBtn" onclick="doLogout()">
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="admin-main">
+
+    <!-- ========== BOOKS PANEL ========== -->
+    <div id="panel-books" class="admin-panel">
+      <div class="admin-panel-header">
+        <h1 class="admin-panel-title">Books Catalogue</h1>
+        <button class="btn-primary btn-sm" onclick="openBookForm()">+ Add Book</button>
+      </div>
+
+      <!-- Add Category mini-form -->
+      <details class="cat-accordion">
+        <summary class="cat-accordion-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" width="14" height="14" style="vertical-align:-2px;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg>Add Book Category</summary>
+        <div class="cat-form">
+          <div class="field-inline">
+            <input type="text" id="bookCatName" class="field-input" placeholder="Category name" maxlength="100" />
+            <span class="field-error" id="bookCatName-err"></span>
+          </div>
+          <button class="btn-secondary btn-sm" onclick="addBookCategory()">Add Category</button>
+        </div>
+      </details>
+
+      <!-- Add / Edit Book form -->
+      <div class="admin-form-card" id="bookFormCard" hidden>
+        <h2 class="form-card-title" id="bookFormTitle">Add New Book</h2>
+        <input type="hidden" id="bookEditId" value="" />
+
+        <div class="form-grid-2">
+          <div class="field-group">
+            <label class="field-label" for="b-title">Title <span class="req">*</span></label>
+            <input type="text" id="b-title" class="field-input" placeholder="Book title"
+                   required maxlength="200" />
+            <span class="field-error" id="b-title-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="b-author">Author <span class="req">*</span></label>
+            <input type="text" id="b-author" class="field-input" placeholder="Author name"
+                   required maxlength="100" />
+            <span class="field-error" id="b-author-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="b-category">Category <span class="req">*</span></label>
+            <select id="b-category" class="field-input field-select" required>
+              <option value="">Select category…</option>
+              {% for cat in book_cats %}
+              <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+            <span class="field-error" id="b-category-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="b-price">Price (₹) <span class="req">*</span></label>
+            <input type="number" id="b-price" class="field-input" placeholder="499"
+                   required min="0.01" max="99999.99" step="0.01" />
+            <span class="field-error" id="b-price-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="b-stock">Stock Qty <span class="req">*</span></label>
+            <input type="number" id="b-stock" class="field-input" placeholder="0"
+                   required min="0" step="1" />
+            <span class="field-error" id="b-stock-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="b-rank">Rank Order <span class="opt">(optional)</span></label>
+            <input type="number" id="b-rank" class="field-input" placeholder="Leave blank"
+                   min="1" step="1" />
+            <span class="field-error" id="b-rank-err"></span>
+          </div>
+          <div class="field-group field-group--full">
+            <label class="field-label" for="b-cover">Cover Image URL <span class="opt">(optional)</span></label>
+            <input type="url" id="b-cover" class="field-input" placeholder="https://…" maxlength="500" />
+            <span class="field-error" id="b-cover-err"></span>
+          </div>
+          <div class="field-group field-group--full">
+            <label class="field-label" for="b-desc">Description <span class="opt">(optional)</span></label>
+            <textarea id="b-desc" class="field-input field-textarea" rows="3"
+                      placeholder="Short blurb…" maxlength="2000"></textarea>
+            <span class="field-error" id="b-desc-err"></span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" onclick="submitBookForm()">Save Book</button>
+          <button class="btn-ghost" onclick="cancelBookForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Books data table -->
+      <div class="table-wrap">
+        <table class="data-table" id="booksTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Rank</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="booksTableBody">
+            <tr><td colspan="8" class="table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- #panel-books -->
+
+    <!-- ========== ART SUPPLIES PANEL ========== -->
+    <div id="panel-art" class="admin-panel" hidden>
+      <div class="admin-panel-header">
+        <h1 class="admin-panel-title">Art Supplies Catalogue</h1>
+        <button class="btn-primary btn-sm" onclick="openArtForm()">+ Add Art Supply</button>
+      </div>
+
+      <!-- Add Art Category mini-form -->
+      <details class="cat-accordion">
+        <summary class="cat-accordion-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" width="14" height="14" style="vertical-align:-2px;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg>Add Art Category</summary>
+        <div class="cat-form">
+          <div class="field-inline">
+            <input type="text" id="artCatName" class="field-input" placeholder="Category name" maxlength="100" />
+            <span class="field-error" id="artCatName-err"></span>
+          </div>
+          <button class="btn-secondary btn-sm" onclick="addArtCategory()">Add Category</button>
+        </div>
+      </details>
+
+      <!-- Add / Edit Art Supply form -->
+      <div class="admin-form-card" id="artFormCard" hidden>
+        <h2 class="form-card-title" id="artFormTitle">Add New Art Supply</h2>
+        <input type="hidden" id="artEditId" value="" />
+
+        <div class="form-grid-2">
+          <div class="field-group">
+            <label class="field-label" for="a-name">Name <span class="req">*</span></label>
+            <input type="text" id="a-name" class="field-input" placeholder="Product name"
+                   required maxlength="200" />
+            <span class="field-error" id="a-name-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="a-brand">Brand <span class="req">*</span></label>
+            <input type="text" id="a-brand" class="field-input" placeholder="Brand name"
+                   required maxlength="100" />
+            <span class="field-error" id="a-brand-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="a-category">Category <span class="req">*</span></label>
+            <select id="a-category" class="field-input field-select" required>
+              <option value="">Select category…</option>
+              {% for cat in art_cats %}
+              <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+            <span class="field-error" id="a-category-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="a-price">Price (₹) <span class="req">*</span></label>
+            <input type="number" id="a-price" class="field-input" placeholder="299"
+                   required min="0.01" max="99999.99" step="0.01" />
+            <span class="field-error" id="a-price-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="a-stock">Stock Qty <span class="req">*</span></label>
+            <input type="number" id="a-stock" class="field-input" placeholder="0"
+                   required min="0" step="1" />
+            <span class="field-error" id="a-stock-err"></span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="a-rank">Rank Order <span class="opt">(optional)</span></label>
+            <input type="number" id="a-rank" class="field-input" placeholder="Leave blank"
+                   min="1" step="1" />
+            <span class="field-error" id="a-rank-err"></span>
+          </div>
+          <div class="field-group field-group--full">
+            <label class="field-label" for="a-image">Image URL <span class="opt">(optional)</span></label>
+            <input type="url" id="a-image" class="field-input" placeholder="https://…" maxlength="500" />
+            <span class="field-error" id="a-image-err"></span>
+          </div>
+          <div class="field-group field-group--full">
+            <label class="field-label" for="a-desc">Description <span class="opt">(optional)</span></label>
+            <textarea id="a-desc" class="field-input field-textarea" rows="3"
+                      placeholder="Short blurb…" maxlength="2000"></textarea>
+            <span class="field-error" id="a-desc-err"></span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" onclick="submitArtForm()">Save Art Supply</button>
+          <button class="btn-ghost" onclick="cancelArtForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Art supplies data table -->
+      <div class="table-wrap">
+        <table class="data-table" id="artTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Rank</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="artTableBody">
+            <tr><td colspan="8" class="table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- #panel-art -->
+
+  </main>
+</div>
+
+<!-- Inline JS constants from Jinja (book/art category lists for dynamic repopulation) -->
+<script>
+  // Initial category data passed from Flask so JS can refresh dropdowns after adding a category
+  window.BOOK_CATS = {{ book_cats | tojson }};
+  window.ART_CATS  = {{ art_cats  | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

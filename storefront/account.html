@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your account — Page & Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="layout">
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Your account</h1>
+
+      <section class="panel">
+        <h2 class="panel-title">Profile details</h2>
+        <form id="profileForm" class="profile-form">
+          <label>
+            Full name
+            <input type="text" id="fName" name="name" placeholder="Jamie Santos" required />
+          </label>
+          <label>
+            Email
+            <input type="email" id="fEmail" name="email" placeholder="jamie@email.com" readonly />
+          </label>
+          <label>
+            Phone
+            <input type="tel" id="fPhone" name="phone" placeholder="+91 90000 00000" />
+          </label>
+          <label class="span-2">
+            Address
+            <input type="text" id="fAddress" name="address" placeholder="Street, city, PIN code" />
+          </label>
+          <button class="btn-primary span-2" type="submit">Save details</button>
+        </form>
+      </section>
+
+      <section class="stats-row">
+        <div class="stat-card">
+          <p class="stat-number" id="cartStat">0</p>
+          <p class="stat-label">items in cart</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number" id="wishStat">0</p>
+          <p class="stat-label">wishlist items</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number">0</p>
+          <p class="stat-label">orders placed</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Previous orders</h2>
+        <p class="empty-state">You haven't placed any orders yet — once checkout is wired up, they'll show up here.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const profile = getProfile();
+      if (profile) {
+        document.getElementById("fName").value = profile.name || "";
+        document.getElementById("fEmail").value = profile.email || "";
+        document.getElementById("fPhone").value = profile.phone || "";
+        document.getElementById("fAddress").value = profile.address || "";
+      }
+
+      document.getElementById("cartStat").textContent = getCartItemCount();
+      document.getElementById("wishStat").textContent = getWishlist().length;
+
+      document.getElementById("profileForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const newProfile = {
+          name: document.getElementById("fName").value.trim(),
+          email: document.getElementById("fEmail").value.trim(),
+          phone: document.getElementById("fPhone").value.trim(),
+          address: document.getElementById("fAddress").value.trim()
+        };
+
+        try {
+          const res = await fetch("/account", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: newProfile.name,
+              phone: newProfile.phone,
+              address: newProfile.address
+            })
+          });
+
+          if (res.status === 401) {
+            window.location.href = "/";
+            return;
+          }
+
+          const data = await res.json();
+          if (!res.ok || data.response !== "OK") {
+            if (data.errors) {
+              const msgs = Object.values(data.errors).join(" ");
+              showToast(msgs);
+            } else {
+              showToast(data.message || "An error occurred.");
+            }
+            return;
+          }
+
+          saveProfile(newProfile);
+          applyHeaderState();
+          showToast("Profile saved — your homepage avatar is now updated");
+        } catch (err) {
+          showToast("Network error. Please try again.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

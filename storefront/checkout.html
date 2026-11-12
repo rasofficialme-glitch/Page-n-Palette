@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout &amp; Bill — Page &amp; Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Checkout &amp; Bill</h1>
+
+      <!-- Empty Cart Warning -->
+      <div id="checkoutEmpty" class="panel empty-state" hidden>
+        <p>Your cart is currently empty. Add items to your cart before proceeding to pay.</p>
+        <a href="index.html" class="btn-primary" style="display:inline-block; margin-top:12px; text-decoration:none;">Browse Products</a>
+      </div>
+
+      <!-- Bill Section -->
+      <div class="checkout-container" id="checkoutContainer">
+        <!-- Thank You Confirmation Section (Placed ABOVE the bill) -->
+        <section class="panel success-panel" id="successSection" hidden>
+          <div class="success-icon-wrap">
+            <i class="icon" data-icon="check"></i>
+          </div>
+          <h2 class="thank-you-title">Thank you for your payment!</h2>
+          <p class="thank-you-sub">Your order has been placed successfully and is now being prepared for shipping.</p>
+          
+          <div class="receipt-card">
+            <div class="receipt-row">
+              <span>Order Reference</span>
+              <strong id="receiptOrderNo">#PP-849201</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Payment Method</span>
+              <strong id="receiptMethod">UPI</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Amount Paid</span>
+              <strong id="receiptAmount">₹0</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Estimated Delivery</span>
+              <strong>2 - 4 Business Days</strong>
+            </div>
+          </div>
+
+          <div class="success-actions">
+            <a href="index.html" class="btn-primary">Return to Homepage</a>
+          </div>
+        </section>
+
+        <!-- Bill Section -->
+        <section class="panel bill-panel" id="billSection">
+          <div class="panel-header">
+            <h2 class="panel-title">Itemized Order Bill</h2>
+            <span class="bill-date" id="billDate"></span>
+          </div>
+
+          <div class="bill-table-wrap">
+            <table class="bill-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-right">Price</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="billItemsBody">
+                <!-- Bill items inserted via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bill-summary">
+            <div class="bill-summary-row">
+              <span>Items Subtotal</span>
+              <span id="billSubtotal">₹0</span>
+            </div>
+            <div class="bill-summary-row">
+              <span>Delivery &amp; Packaging</span>
+              <span class="free-tag">FREE</span>
+            </div>
+            <div class="bill-summary-row grand-total-row">
+              <span>Grand Total</span>
+              <strong id="billGrandTotal">₹0</strong>
+            </div>
+          </div>
+
+          <div class="bill-actions" id="billActions">
+            <button type="button" class="btn-primary continue-pay-btn" id="continueToPayBtn">
+              Continue to pay <i class="icon" data-icon="arrowRight"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Payment Methods Section (Shown after clicking 'Continue to pay') -->
+        <section class="panel payment-panel" id="paymentSection" hidden>
+          <div class="panel-header">
+            <h2 class="panel-title">Select Payment Method</h2>
+            <p class="panel-sub">Choose your preferred payment method below to complete the order.</p>
+          </div>
+
+          <div class="payment-grid">
+            <button type="button" class="payment-card" data-method="UPI">
+              <div class="payment-card-icon"><i class="icon" data-icon="upi"></i></div>
+              <div class="payment-card-info">
+                <h3>UPI</h3>
+                <p>Google Pay, PhonePe, Paytm, BHIM</p>
+              </div>
+              <span class="select-badge">Pay Now</span>
+            </button>
+
+            <button type="button" class="payment-card" data-method="Net Banking">
+              <div class="payment-card-icon"><i class="icon" data-icon="bank"></i></div>
+              <div class="payment-card-info">
+                <h3>Net Banking</h3>
+                <p>All major Indian banks supported</p>
+              </div>
+              <span class="select-badge">Pay Now</span>
+            </button>
+
+            <button type="button" class="payment-card" data-method="Credit Card">
+              <div class="payment-card-icon"><i class="icon" data-icon="card"></i></div>
+              <div class="payment-card-info">
+                <h3>Credit Card</h3>
+                <p>Visa, Mastercard, American Express</p>
+              </div>
+              <span class="select-badge">Pay Now</span>
+            </button>
+
+            <button type="button" class="payment-card" data-method="Debit Card">
+              <div class="payment-card-icon"><i class="icon" data-icon="card"></i></div>
+              <div class="payment-card-info">
+                <h3>Debit Card</h3>
+                <p>Visa, Mastercard, RuPay</p>
+              </div>
+              <span class="select-badge">Pay Now</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    let grandTotalAmount = 0;
+    let cachedCart = [];
+
+    function renderBill() {
+      const cart = getCart();
+      if (cart.length > 0) cachedCart = cart;
+      const displayCart = cart.length > 0 ? cart : cachedCart;
+
+      const emptyBox = document.getElementById("checkoutEmpty");
+      const container = document.getElementById("checkoutContainer");
+      const tbody = document.getElementById("billItemsBody");
+      const subtotalEl = document.getElementById("billSubtotal");
+      const grandTotalEl = document.getElementById("billGrandTotal");
+      const dateEl = document.getElementById("billDate");
+
+      if (dateEl) {
+        const today = new Date();
+        dateEl.textContent = today.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      }
+
+      if (displayCart.length === 0) {
+        emptyBox.hidden = false;
+        container.hidden = true;
+        return;
+      }
+
+      emptyBox.hidden = true;
+      container.hidden = false;
+
+      let subtotal = 0;
+      tbody.innerHTML = displayCart.map((entry) => {
+        const p = findProduct(entry.id);
+        if (!p) return "";
+        const qty = entry.qty || 1;
+        const itemTotal = p.price * qty;
+        subtotal += itemTotal;
+        const imgTag = p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" class="product-img" onerror="this.style.display='none'" />` : "";
+        
+        return `
+          <tr>
+            <td>
+              <div class="bill-item-cell">
+                <span class="thumb thumb-small ${p.thumb}">${imgTag}</span>
+                <div>
+                  <p class="bill-item-name">${escapeHtml(p.name)}</p>
+                  <p class="bill-item-meta">${escapeHtml(entry.note ? "Pairing: " + entry.note : p.category)}</p>
+                </div>
+              </div>
+            </td>
+            <td class="text-center font-bold">× ${qty}</td>
+            <td class="text-right">₹${p.price}</td>
+            <td class="text-right font-bold">₹${itemTotal}</td>
+          </tr>`;
+      }).join("");
+
+      grandTotalAmount = subtotal;
+      subtotalEl.textContent = "₹" + subtotal;
+      grandTotalEl.textContent = "₹" + subtotal;
+      renderIcons(tbody);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderBill();
+
+      const continueBtn = document.getElementById("continueToPayBtn");
+      const paymentSection = document.getElementById("paymentSection");
+      const billSection = document.getElementById("billSection");
+      const successSection = document.getElementById("successSection");
+      const billActions = document.getElementById("billActions");
+
+      if (continueBtn) {
+        continueBtn.addEventListener("click", () => {
+          paymentSection.hidden = false;
+          paymentSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          renderIcons(paymentSection);
+        });
+      }
+
+      document.querySelectorAll(".payment-card").forEach((card) => {
+        card.addEventListener("click", async () => {
+          const method = card.dataset.method;
+          const items = getCart().map(e => ({ id: e.id, qty: e.qty || 1 }));
+          
+          try {
+            const res = await fetch("/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ items, payment_method: method })
+            });
+            
+            if (res.status === 401) {
+              window.location.href = "/";
+              return;
+            }
+            
+            const data = await res.json();
+            if (!res.ok || data.response !== "OK") {
+              showToast(data.message || "An error occurred.");
+              return;
+            }
+            
+            document.getElementById("receiptOrderNo").textContent = data.order_ref;
+            document.getElementById("receiptMethod").textContent = data.payment_method;
+            document.getElementById("receiptAmount").textContent = "₹" + data.total;
+
+            // Clear cart state
+            clearCart();
+
+            // Hide payment selection
+            paymentSection.hidden = true;
+            if (billActions) billActions.hidden = true;
+
+            // Show thank you section ABOVE bill, keep bill visible UNDER thank you section
+            successSection.hidden = false;
+            billSection.hidden = false;
+
+            renderIcons(successSection);
+            showToast(`Payment of ₹${data.total} via ${data.payment_method} successful!`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            
+          } catch (err) {
+            showToast("Network error. Please try again.");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

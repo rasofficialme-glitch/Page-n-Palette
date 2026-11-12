@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your cart — Page & Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="layout">
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Your cart</h1>
+
+      <div class="cart-list" id="cartList"></div>
+      <p id="cartEmpty" class="empty-state" hidden>Your cart is empty — try adding a pairing from the homepage.</p>
+
+      <div class="cart-total-bar" id="cartTotal" hidden>
+        <div class="cart-total-info">
+          <span>Total amount</span>
+          <strong id="cartTotalAmount">₹0</strong>
+        </div>
+        <a href="checkout.html" class="btn-primary pay-btn" id="payBtn">
+          Pay <i class="icon" data-icon="arrowRight"></i>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    function renderCartPage() {
+      const cart = getCart();
+      const list = document.getElementById("cartList");
+      const empty = document.getElementById("cartEmpty");
+      const totalBox = document.getElementById("cartTotal");
+
+      if (cart.length === 0) {
+        list.innerHTML = "";
+        empty.hidden = false;
+        totalBox.hidden = true;
+        return;
+      }
+      empty.hidden = true;
+      totalBox.hidden = false;
+
+      let total = 0;
+      list.innerHTML = cart.map((entry, index) => {
+        const p = findProduct(entry.id);
+        if (!p) return "";
+        const qty = entry.qty || 1;
+        total += p.price * qty;
+        const imgTag = p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" class="product-img" onerror="this.style.display='none'" />` : "";
+        return `
+          <div class="cart-row" data-id="${p.id}" style="--i:${index}">
+            <span class="thumb thumb-small ${p.thumb}">${imgTag}</span>
+            <div class="cart-row-info">
+              <p class="product-name">${escapeHtml(p.name)}</p>
+              <p class="product-meta">${escapeHtml(entry.note ? "From pair: " + entry.note : p.category)} — ₹${p.price} each</p>
+            </div>
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" data-step="-1" aria-label="Decrease quantity of ${escapeHtml(p.name)}"><i class="icon" data-icon="minus"></i></button>
+              <span>${qty}</span>
+              <button type="button" class="qty-btn" data-step="1" aria-label="Increase quantity of ${escapeHtml(p.name)}"><i class="icon" data-icon="plus"></i></button>
+            </div>
+            <p class="cart-row-price">₹${p.price * qty}</p>
+            <button class="remove-btn" type="button" aria-label="Remove ${escapeHtml(p.name)} from cart">
+              <i class="icon" data-icon="trash"></i> Remove
+            </button>
+          </div>`;
+      }).join("");
+
+      document.getElementById("cartTotalAmount").textContent = "₹" + total;
+      renderIcons(list);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderCartPage();
+
+      document.addEventListener("click", (e) => {
+        const removeBtn = e.target.closest(".remove-btn");
+        if (removeBtn) {
+          const row = removeBtn.closest(".cart-row");
+          removeFromCart(row.dataset.id);
+          showToast("Removed from cart");
+          applyHeaderState();
+          renderCartPage();
+          return;
+        }
+
+        const qtyBtn = e.target.closest(".qty-btn");
+        if (qtyBtn) {
+          const row = qtyBtn.closest(".cart-row");
+          const id = row.dataset.id;
+          const cart = getCart();
+          const entry = cart.find((en) => en.id === id);
+          if (!entry) return;
+          const nextQty = (entry.qty || 1) + Number(qtyBtn.dataset.step);
+          setCartQty(id, nextQty);
+          applyHeaderState();
+          renderCartPage();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

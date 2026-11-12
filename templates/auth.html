@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page &amp; Palette — Books &amp; Art Supplies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body class="auth-page">
+
+  <!-- =====================================================================
+       Themed Background Layer: Warm Studio Canvas with Books & Art Motifs
+       ===================================================================== -->
+  <div class="auth-bg-art" aria-hidden="true">
+    <div class="art-glow glow-1"></div>
+    <div class="art-glow glow-2"></div>
+    <div class="art-glow glow-3"></div>
+
+    <!-- Floating Watermark Motifs -->
+    <svg class="bg-motif motif-books-1" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+      <path d="M12 78 C 30 68, 48 72, 50 82 C 52 72, 70 68, 88 78 L 88 28 C 70 18, 52 22, 50 32 C 48 22, 30 18, 12 28 Z" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M50 32 L 50 82" stroke-width="2.5" />
+      <path d="M22 38 C 32 32, 42 34, 46 39" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M22 48 C 32 42, 42 44, 46 49" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M22 58 C 32 52, 42 54, 46 59" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M78 38 C 68 32, 58 34, 54 39" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M78 48 C 68 42, 58 44, 54 49" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M78 58 C 68 52, 58 54, 54 59" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+
+    <svg class="bg-motif motif-palette-1" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+      <path d="M50 14 C 28 14, 14 28, 14 50 C 14 70, 26 84, 44 84 C 50 84, 54 80, 54 74 C 54 69, 58 65, 66 65 C 76 65, 84 57, 84 46 C 84 26, 70 14, 50 14 Z" stroke-width="2.5" />
+      <circle cx="32" cy="34" r="4.5" fill="currentColor" />
+      <circle cx="48" cy="26" r="4.5" fill="currentColor" />
+      <circle cx="65" cy="34" r="4.5" fill="currentColor" />
+      <circle cx="72" cy="49" r="4.5" fill="currentColor" />
+      <circle cx="36" cy="62" r="6" stroke-width="2" />
+    </svg>
+
+    <svg class="bg-motif motif-quill-1" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+      <path d="M82 12 C 62 18, 38 42, 28 72 L 38 74 C 48 52, 68 32, 82 12 Z" stroke-width="2.5" />
+      <path d="M28 72 L 20 86 L 33 83 Z" fill="currentColor" />
+      <path d="M60 26 L 46 40" stroke-width="1.5" />
+      <path d="M52 36 L 40 48" stroke-width="1.5" />
+    </svg>
+
+    <svg class="bg-motif motif-brush-1" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+      <path d="M78 14 L 38 54 L 30 52 L 24 64 L 34 74 L 46 68 L 44 60 L 84 20 Z" stroke-width="2" />
+      <path d="M24 64 C 18 70, 14 78, 12 86 C 20 84, 28 80, 34 74 Z" fill="currentColor" />
+    </svg>
+  </div>
+
+  <!-- Global notification banner -->
+  <div id="globalBanner" class="global-banner" role="alert" aria-live="polite" hidden></div>
+
+  <!-- =====================================================================
+       Main Viewport Container
+       ===================================================================== -->
+  <div class="auth-center">
+
+    <!-- ===== Prominent Brand Header ===== -->
+    <header class="auth-hero">
+      <div class="brand-logo" aria-label="Page &amp; Palette Logo">
+        <svg class="brand-logo-svg" width="84" height="84" viewBox="0 0 60 60" aria-hidden="true">
+          <defs>
+            <linearGradient id="bookSpineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#522619" />
+              <stop offset="100%" stop-color="#7A3B2E" />
+            </linearGradient>
+            <linearGradient id="paletteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F2C6A0" />
+              <stop offset="100%" stop-color="#E8A33D" />
+            </linearGradient>
+            <linearGradient id="brushGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#C1592B" />
+              <stop offset="100%" stop-color="#8F4A3B" />
+            </linearGradient>
+            <filter id="logoShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#522619" flood-opacity="0.25" />
+            </filter>
+          </defs>
+
+          <!-- Book Left Wing -->
+          <path d="M12 48 L12 14 Q12 10 16 10 L30 10 L30 48 Q22 44 12 48 Z"
+                fill="url(#bookSpineGrad)" filter="url(#logoShadow)" />
+          <!-- Book Right Wing (Art Palette Shaped) -->
+          <path d="M48 48 L48 14 Q48 10 44 10 L30 10 L30 48 Q38 44 48 48 Z"
+                fill="url(#paletteGrad)" filter="url(#logoShadow)" />
+          <!-- Book Center Binding / Fold -->
+          <path d="M30 10 L40 2 L43 5 L33 12.5 Z" fill="url(#brushGrad)" />
+          <!-- Paint swatches on right page -->
+          <circle cx="36" cy="20" r="3" fill="#C1592B" />
+          <circle cx="42" cy="26" r="3" fill="#7A3B2E" />
+          <circle cx="38" cy="34" r="3" fill="#6E7F5C" />
+          <!-- Bookmark Ribbon -->
+          <path d="M29 10 L29 38 L32 34 L35 38 L35 10 Z" fill="#FFF3E4" opacity="0.9" />
+        </svg>
+      </div>
+      <h1 class="brand-name">Page &amp; Palette</h1>
+      <p class="brand-tagline">Where inspiring literature meets fine artistry</p>
+    </header>
+
+    <!-- ===== Interactive Stage: Side Illustrations + Prominent Auth Card ===== -->
+    <div class="auth-stage">
+
+      <!-- LEFT SIDE: Literature & Books Illustration -->
+      <aside class="auth-illustration-side side-left" aria-label="Books and Reading">
+        <div class="illustration-card">
+          <div class="illustration-art">
+            <svg class="feature-svg" viewBox="0 0 220 180" fill="none" aria-hidden="true">
+              <!-- Glow backdrop -->
+              <circle cx="110" cy="90" r="70" fill="#E8A33D" fill-opacity="0.12" />
+
+              <!-- Bottom Stacked Book 1 -->
+              <rect x="25" y="130" width="170" height="26" rx="4" fill="#7A3B2E" />
+              <rect x="25" y="134" width="166" height="4" fill="#E8A33D" opacity="0.8" />
+              <path d="M190 134 L195 143 L190 152 Z" fill="#FFF3E4" />
+
+              <!-- Stacked Book 2 -->
+              <rect x="35" y="104" width="150" height="24" rx="4" fill="#C1592B" />
+              <rect x="35" y="108" width="146" height="3" fill="#F2C6A0" opacity="0.7" />
+
+              <!-- Stacked Book 3 -->
+              <rect x="45" y="80" width="130" height="22" rx="4" fill="#6E7F5C" />
+
+              <!-- Open Book on Top -->
+              <path d="M55 76 C 75 62, 100 66, 110 74 C 120 66, 145 62, 165 76 L 165 38 C 145 26, 120 30, 110 38 C 100 30, 75 26, 55 38 Z"
+                    fill="#FFFBF5" stroke="#EED7BC" stroke-width="2" />
+              <path d="M110 38 L110 74" stroke="#D8A88A" stroke-width="2" />
+              <!-- Page Text Lines -->
+              <line x1="68" y1="46" x2="98" y2="46" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+              <line x1="68" y1="53" x2="98" y2="53" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+              <line x1="68" y1="60" x2="90" y2="60" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+              <line x1="122" y1="46" x2="152" y2="46" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+              <line x1="122" y1="53" x2="152" y2="53" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+              <line x1="122" y1="60" x2="144" y2="60" stroke="#94714B" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+
+              <!-- Golden Ribbon -->
+              <path d="M109 38 C 105 50, 100 70, 95 85 L 100 82 L 105 87 Z" fill="#E8A33D" />
+
+              <!-- Decorative Stars / Sparks -->
+              <path d="M38 45 L40 38 L42 45 L49 47 L42 49 L40 56 L38 49 L31 47 Z" fill="#E8A33D" />
+              <path d="M180 62 L181 57 L183 62 L188 63 L183 65 L181 70 L180 65 L175 63 Z" fill="#C1592B" />
+              <circle cx="188" cy="115" r="3" fill="#E8A33D" />
+            </svg>
+          </div>
+          <div class="illustration-caption">
+            <span class="caption-badge">Curated Reading</span>
+            <h3 class="caption-title">Stories That Move You</h3>
+            <p class="caption-desc">Hand-picked Fiction, Thrillers, Poetry, and Self-Help titles curated for thoughtful and curious minds.</p>
+            <div class="caption-tags">
+              <span class="tag-pill">24+ Handpicked Titles</span>
+              <span class="tag-pill">Author Spotlights</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: Enlarged & Prominent Auth Card -->
+      <main class="auth-card">
+
+        <!-- Tab switcher (Sign In & Sign Up) -->
+        <div class="auth-tabs" role="tablist" aria-label="Sign In or Sign Up">
+          <button class="auth-tab active" id="tab-signin" role="tab"
+                  aria-selected="true" aria-controls="panel-signin"
+                  onclick="switchTab('signin')">Sign In</button>
+          <button class="auth-tab" id="tab-signup" role="tab"
+                  aria-selected="false" aria-controls="panel-signup"
+                  onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- ===== SIGN IN panel ===== -->
+        <div id="panel-signin" class="auth-panel" role="tabpanel" aria-labelledby="tab-signin">
+          <div class="panel-header-box">
+            <h2 class="auth-panel-title">Welcome back</h2>
+            <p class="auth-panel-sub">Sign in to your Page &amp; Palette account to continue.</p>
+          </div>
+
+          <form id="signinForm" novalidate>
+
+            <div class="field-group">
+              <label for="si-email" class="field-label">Email address</label>
+              <div class="field-input-wrap">
+                <input type="email" id="si-email" name="email" class="field-input"
+                       placeholder="name@example.com"
+                       required maxlength="254"
+                       autocomplete="email" />
+              </div>
+              <span class="field-error" id="si-email-err" aria-live="polite"></span>
+            </div>
+
+            <div class="field-group">
+              <div class="field-label-row">
+                <label for="si-password" class="field-label">Password</label>
+              </div>
+              <div class="input-eye-wrap">
+                <input type="password" id="si-password" name="password" class="field-input"
+                       placeholder="Enter your password"
+                       required minlength="8"
+                       autocomplete="current-password" />
+                <button type="button" class="eye-toggle" onclick="toggleEye('si-password', this)"
+                        aria-label="Toggle password visibility">👁</button>
+              </div>
+              <span class="field-error" id="si-password-err" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full btn-prominent" id="signinBtn">
+              <span>Sign In</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+          </form>
+
+          <p class="auth-switch">
+            New to Page &amp; Palette?
+            <button type="button" class="link-btn" onclick="switchTab('signup')">Create an account</button>
+          </p>
+        </div>
+
+        <!-- ===== SIGN UP panel ===== -->
+        <div id="panel-signup" class="auth-panel hidden" role="tabpanel" aria-labelledby="tab-signup">
+          <div class="panel-header-box">
+            <h2 class="auth-panel-title">Create your account</h2>
+            <p class="auth-panel-sub">Join Page &amp; Palette today for curated books and artist materials.</p>
+          </div>
+
+          <form id="signupForm" novalidate>
+
+            <div class="field-group">
+              <label for="su-name" class="field-label">Full name <span class="req">*</span></label>
+              <input type="text" id="su-name" name="name" class="field-input"
+                     placeholder="e.g. Maya Sharma"
+                     required maxlength="200"
+                     autocomplete="name" />
+              <span class="field-error" id="su-name-err" aria-live="polite"></span>
+            </div>
+
+            <div class="field-group">
+              <label for="su-email" class="field-label">Email address <span class="req">*</span></label>
+              <input type="email" id="su-email" name="email" class="field-input"
+                     placeholder="name@example.com"
+                     required maxlength="254"
+                     autocomplete="email" />
+              <span class="field-error" id="su-email-err" aria-live="polite"></span>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="su-password" class="field-label">Password <span class="req">*</span></label>
+                <div class="input-eye-wrap">
+                  <input type="password" id="su-password" name="password" class="field-input"
+                         placeholder="Min 8 chars (letter + digit)"
+                         required minlength="8" maxlength="128"
+                         autocomplete="new-password" />
+                  <button type="button" class="eye-toggle" onclick="toggleEye('su-password', this)"
+                          aria-label="Toggle password visibility">👁</button>
+                </div>
+                <span class="field-error" id="su-password-err" aria-live="polite"></span>
+              </div>
+
+              <div class="field-group">
+                <label for="su-confirm" class="field-label">Confirm password <span class="req">*</span></label>
+                <div class="input-eye-wrap">
+                  <input type="password" id="su-confirm" name="confirm_password" class="field-input"
+                         placeholder="Repeat password"
+                         required minlength="8"
+                         autocomplete="new-password" />
+                  <button type="button" class="eye-toggle" onclick="toggleEye('su-confirm', this)"
+                          aria-label="Toggle password visibility">👁</button>
+                </div>
+                <span class="field-error" id="su-confirm-err" aria-live="polite"></span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="su-phone" class="field-label">Mobile number <span class="opt">(optional)</span></label>
+              <input type="tel" id="su-phone" name="phone" class="field-input"
+                     placeholder="10-digit number e.g. 9876543210"
+                     maxlength="15"
+                     pattern="^(\+91)?[6-9]\d{9}$"
+                     autocomplete="tel" />
+              <span class="field-error" id="su-phone-err" aria-live="polite"></span>
+            </div>
+
+            <div class="field-group">
+              <label for="su-address" class="field-label">Delivery address <span class="opt">(optional)</span></label>
+              <textarea id="su-address" name="address" class="field-input field-textarea"
+                        placeholder="Street, City, PIN Code"
+                        maxlength="500" rows="2"
+                        autocomplete="street-address"></textarea>
+              <span class="field-error" id="su-address-err" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full btn-prominent" id="signupBtn">
+              <span>Create Account</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+          </form>
+
+          <p class="auth-switch">
+            Already have an account?
+            <button type="button" class="link-btn" onclick="switchTab('signin')">Sign in</button>
+          </p>
+        </div>
+
+        <!-- ===== VERIFY EMAIL panel (shown after sign-up, or when an unverified account signs in) ===== -->
+        <div id="panel-verify" class="auth-panel hidden" role="tabpanel" aria-label="Verify your email">
+          <div class="panel-header-box">
+            <h2 class="auth-panel-title">Verify your email</h2>
+            <p class="auth-panel-sub">Enter the 6-digit code we sent to <strong id="vf-email-label"></strong>. It expires in 10 minutes.</p>
+          </div>
+
+          <form id="verifyForm" novalidate>
+            <div class="field-group">
+              <label for="vf-otp" class="field-label">Verification code</label>
+              <input type="text" id="vf-otp" name="otp" class="field-input"
+                     placeholder="123456"
+                     inputmode="numeric" pattern="\d{6}" maxlength="6"
+                     autocomplete="one-time-code" />
+              <span class="field-error" id="vf-otp-err" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full btn-prominent" id="verifyBtn">
+              <span>Verify Email</span>
+            </button>
+          </form>
+
+          <p class="auth-switch">
+            Didn't get it?
+            <button type="button" class="link-btn" id="resendBtn">Resend code</button>
+          </p>
+          <p class="auth-switch">
+            <button type="button" class="link-btn" onclick="switchTab('signin')">Back to Sign in</button>
+          </p>
+        </div>
+
+      </main>
+
+      <!-- RIGHT SIDE: Art & Studio Illustration -->
+      <aside class="auth-illustration-side side-right" aria-label="Art Supplies and Creativity">
+        <div class="illustration-card">
+          <div class="illustration-art">
+            <svg class="feature-svg" viewBox="0 0 220 180" fill="none" aria-hidden="true">
+              <!-- Glow backdrop -->
+              <circle cx="110" cy="90" r="70" fill="#C1592B" fill-opacity="0.12" />
+
+              <!-- Artist Palette -->
+              <path d="M110 24 C 60 24, 25 55, 25 105 C 25 145, 55 165, 95 165 C 112 165, 122 152, 122 140 C 122 128, 132 120, 148 120 C 172 120, 195 102, 195 78 C 195 38, 160 24, 110 24 Z"
+                    fill="#F2C6A0" stroke="#D8A88A" stroke-width="2" />
+
+              <!-- Thumb hole -->
+              <ellipse cx="60" cy="130" rx="14" ry="11" fill="#FFF3E4" stroke="#D8A88A" stroke-width="1.8" />
+
+              <!-- Vibrant Paint Dollops -->
+              <circle cx="68" cy="65" r="10" fill="#7A3B2E" />
+              <circle cx="98" cy="46" r="11" fill="#E8A33D" />
+              <circle cx="134" cy="48" r="10" fill="#C1592B" />
+              <circle cx="162" cy="70" r="9" fill="#6E7F5C" />
+              <circle cx="165" cy="98" r="8" fill="#522619" />
+
+              <!-- Two Crossed Brushes -->
+              <!-- Brush 1: Fine detail round brush -->
+              <g transform="rotate(35 110 90)">
+                <rect x="106" y="20" width="8" height="110" rx="3" fill="#8F4A3B" />
+                <rect x="105" y="130" width="10" height="18" fill="#EED7BC" stroke="#94714B" stroke-width="1" />
+                <path d="M105 148 C 105 160, 110 170, 110 170 C 110 170, 115 160, 115 148 Z" fill="#3D2B1F" />
+              </g>
+
+              <!-- Brush 2: Flat wash brush -->
+              <g transform="rotate(-30 110 90)">
+                <rect x="104" y="25" width="12" height="105" rx="3" fill="#D8A88A" />
+                <rect x="103" y="130" width="14" height="16" fill="#C1592B" />
+                <path d="M103 146 L 117 146 L 115 166 L 105 166 Z" fill="#E8A33D" />
+              </g>
+
+              <!-- Paint Splatters -->
+              <circle cx="48" cy="40" r="3.5" fill="#E8A33D" />
+              <circle cx="42" cy="48" r="2" fill="#E8A33D" />
+              <circle cx="180" cy="130" r="3.5" fill="#C1592B" />
+              <circle cx="190" cy="122" r="2.5" fill="#C1592B" />
+              <circle cx="140" cy="155" r="4" fill="#6E7F5C" />
+            </svg>
+          </div>
+          <div class="illustration-caption">
+            <span class="caption-badge">Fine Artistry</span>
+            <h3 class="caption-title">Tools That Inspire You</h3>
+            <p class="caption-desc">Professional-grade sketchbooks, gouache palettes, natural-hair brushes, and architectural fine pens.</p>
+            <div class="caption-tags">
+              <span class="tag-pill">30+ Art Materials</span>
+              <span class="tag-pill">Curated Combos</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div><!-- .auth-stage -->
+
+    <!-- ===== Bottom Guest Skip Link ===== -->
+    <div class="auth-guest-row">
+      <a class="skip-link" href="/shop/">
+        <span>Skip for now &amp; explore store as guest</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+  </div><!-- .auth-center -->
+
+  <!-- Client-side logic: preserved authentication interactions -->
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

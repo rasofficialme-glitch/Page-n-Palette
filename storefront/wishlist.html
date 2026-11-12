@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your wishlist — Page & Palette</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <div class="layout">
+    <!-- Customer navigation bar: filled in by common.js (greeting, category dropdowns, links) -->
+    <header id="customerNav" class="customer-nav"></header>
+
+    <main class="main">
+      <header class="topbar">
+        <form class="search" action="index.html" method="get">
+          <i class="icon" data-icon="search"></i>
+          <input type="search" name="q" placeholder="Search books and supplies" autocomplete="off" />
+        </form>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <i class="icon" data-icon="moon"></i>
+          </button>
+          <a class="avatar" href="account.html" aria-label="Account details">JS</a>
+        </div>
+      </header>
+
+      <h1 class="page-title">Your wishlist</h1>
+
+      <div class="product-grid" id="wishlistGrid"></div>
+      <p id="wishlistEmpty" class="empty-state" hidden>Nothing saved yet — tap the heart on any product to add it here.
+      </p>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    function renderWishlistPage() {
+      const ids = getWishlist();
+      const grid = document.getElementById("wishlistGrid");
+      const empty = document.getElementById("wishlistEmpty");
+      if (!grid || !empty) return;
+
+      const validProducts = ids.map((id) => findProduct(id)).filter(Boolean);
+
+      if (validProducts.length === 0) {
+        grid.innerHTML = "";
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+
+      grid.innerHTML = validProducts.map((p, index) => {
+        const imgTag = p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" class="product-img" loading="lazy" onerror="this.style.display='none'" />` : "";
+        return `
+          <article class="product-card" data-id="${p.id}" style="--i:${index}">
+            <div class="thumb-wrap">
+              <span class="thumb ${p.thumb}">${imgTag}</span>
+              <span class="quick-peek"><i class="icon" data-icon="eye"></i> Quick view</span>
+            </div>
+            <p class="product-name">${escapeHtml(p.name)}</p>
+            <p class="product-meta">${escapeHtml(p.category)} — ₹${p.price}</p>
+            <button class="wish-toggle active" type="button" aria-label="Remove ${escapeHtml(p.name)} from wishlist">
+              <i class="icon" data-icon="heart"></i>
+            </button>
+          </article>`;
+      }).join("");
+      renderIcons(grid);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderWishlistPage();
+      document.addEventListener("pp:wishlist-changed", renderWishlistPage);
+
+      document.addEventListener("click", (e) => {
+        const wishBtn = e.target.closest(".wish-toggle");
+        if (wishBtn) {
+          e.stopPropagation();
+          const card = wishBtn.closest(".product-card");
+          const id = card.dataset.id;
+          toggleWishlist(id);
+          showToast("Removed from wishlist");
+          applyHeaderState();
+          renderWishlistPage();
+          return;
+        }
+
+        const card = e.target.closest(".product-card");
+        if (card) openQuickView(card.dataset.id);
+      });
+    });
+  </script>
+</body>
+
+</html>
