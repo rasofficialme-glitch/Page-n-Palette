@@ -240,50 +240,51 @@ def seed_bundles():
         print(f"[seed] Created Bundle: {bun['book_title']} + {bun['art_name']}.")
 
 
+def _find_auth_user_id(email: str):
+    """Return the Supabase Auth user id for an email, or None if no such auth user exists."""
+    page = 1
+    while True:
+        users = supabase.auth.admin.list_users(page=page, per_page=100)
+        if not users:
+            return None
+        for u in users:
+            if (getattr(u, "email", "") or "").lower() == email.lower():
+                return str(u.id)
+        if len(users) < 100:
+            return None
+        page += 1
+
+
 def seed_admin():
-    """Create the admin user via Supabase Auth and insert their profile row."""
-    # Check if profile already exists (idempotent)
-    existing = supabase.table("profiles").select("user_id")\
-        .eq("email", ADMIN_EMAIL).maybe_single().execute()
-    if existing.data:
+    """Create the admin in Supabase Auth (pre-confirmed) and insert their profile row."""
+    # Idempotent: skip if the profile row already exists.
+    # (limit(1) + list is used instead of maybe_single(), which returns None when no row exists.)
+    existing = supabase.table("profiles").select("user_id").eq("email", ADMIN_EMAIL).limit(1).execute()
+    if existing is not None and existing.data:
         print(f"[seed] Admin user '{ADMIN_EMAIL}' already exists — skipped.")
         return
 
-    # Create admin account in Supabase Auth
     try:
-        res = supabase.auth.sign_up({
-            "email":    ADMIN_EMAIL,
-            "password": ADMIN_PASSWORD,
-            "options":  {
-                "data": {
-                    "name": ADMIN_NAME,
-                    "role": "admin",
-                }
-            }
-        })
-        user_id = res.user.id
-    except Exception as e:
-        err_msg = str(e)
-        # If the auth account already exists but profile row is missing, fetch the UID
-        if "already registered" in err_msg or "User already registered" in err_msg:
+        user_id = _find_auth_user_id(ADMIN_EMAIL)
+        if user_id:
             print(f"[seed] Auth account for {ADMIN_EMAIL} already exists — inserting profile only.")
-            # Sign in to get the UID
-            try:
-                login = supabase.auth.sign_in_with_password({
-                    "email":    ADMIN_EMAIL,
-                    "password": ADMIN_PASSWORD,
-                })
-                user_id = login.user.id
-            except Exception as login_err:
-                print(f"[seed] ERROR: Could not retrieve admin UID: {login_err}")
-                return
         else:
-            print(f"[seed] ERROR creating admin auth account: {e}")
-            return
+            # The admin API (needs SUPABASE_SECRET_KEY) creates the user already email-confirmed,
+            # so you can log in immediately even when "Confirm email" is on in Supabase.
+            res = supabase.auth.admin.create_user({
+                "email": ADMIN_EMAIL,
+                "password": ADMIN_PASSWORD,
+                "email_confirm": True,
+                "user_metadata": {"name": ADMIN_NAME, "role": "admin"},
+            })
+            user_id = str(res.user.id)
+    except Exception as e:
+        print(f"[seed] ERROR creating admin auth account: {e}")
+        print("[seed] Hint: SUPABASE_SECRET_KEY must be the server (secret / service_role) key.")
+        return
 
-    # Insert profile row
-    supabase.table("profiles").insert({
-        "user_id":         str(user_id),
+    supabase.table("profiles").upsert({
+        "user_id":         user_id,
         "name":            ADMIN_NAME,
         "email":           ADMIN_EMAIL,
         "role":            "admin",
